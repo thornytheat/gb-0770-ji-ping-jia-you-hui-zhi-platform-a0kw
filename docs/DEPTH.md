@@ -11,7 +11,7 @@
 | M3 两端读数重建 | 区分回卷和人为归零 | `GET/POST /api/readings` | `app/readings/delta.py` `app/readings/rebuild.py` | `tests/test_readings.py` |
 | M4 密度换算与误差带 | 复算油温订正和容差 | `GET/POST /api/mass` | `app/conversion/standard.py` `app/conversion/calculate.py` | `tests/test_mass.py` |
 | M5 库存和签单对账 | 核对罐车与逐票签收差额 | `GET/POST /api/balance` | `app/settlement/inventory.py` `app/settlement/receipts.py` `app/settlement/report.py` | `tests/test_settlement.py` |
-| M6 批次留档复跑 | 保存清单与各阶段快照 | `POST /api/shifts` | `app/ledger/replay.py` `app/ledger/sqlite_book.py` | `tests/test_replay.py` |
+| M6 批次留档复跑 | 保存清单与各阶段快照 | `POST /api/shifts` `POST /api/shifts/{batch}/recheck` | `app/ledger/replay.py` `app/ledger/sqlite_book.py` | `tests/test_replay.py` `tests/test_recheck.py` |
 | M7 加注证据签发 | 固定签发证据并复验摘要 | `POST /api/shifts/{batch}/sign` | `app/dispatch/signatures.py` `app/dispatch/document.py` | `tests/test_dispatch.py` |
 
 ## 陷阱登记
@@ -29,3 +29,7 @@
 | TRAP-25 | 多版本同时生效 | 配置文件顺序决定 | 高修订胜出，并列挂起 | `app/meters/select.py` | `tests/test_versions.py::test_overlap_higher_version_selected` |
 
 样例包含 40 原件、35 采信、4 隔离和 1 重复。两辆库存可核车辆的 510000 g 等于 247600 g 发放、261000 g 期末与 1400 g 差额。另有 FT-23 的 16000 g 已核计量，库存缺期末锚点。
+
+## 口径变化与复算
+
+批次键覆盖规则、参数、车队配置与三份 CSV 摘要；班次键只覆盖三份 CSV 摘要，因此同一批三联单在规则更新后复算会得到同班次的新批次行，旧批次及其签发校验和原样保留。`POST /api/shifts/{batch}/recheck` 重交同一批三联单（摘要须与原批次一致，否则 409），按当前规则落账并返回沿革；`GET /api/shifts/{batch}` 的 `lineage` 列出同一班次各口径的规则、参数、落账时间、适用区间与签发状态。同一班次同一口径的复算命中既有批次键，重试不新增结果。

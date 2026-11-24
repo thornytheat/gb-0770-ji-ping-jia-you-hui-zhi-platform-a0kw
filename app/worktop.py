@@ -2,7 +2,7 @@ from decimal import Decimal
 from flask import Blueprint,current_app,render_template,request
 
 from app.bundles import sample_set
-from app.configuration import RULESET
+from app.configuration import current_rules
 from app.diagnostics import RampError
 from app.ledger.replay import list_shifts
 from app.shift import compute
@@ -25,5 +25,5 @@ def view(tab='balance'):
     name = request.args.get('sample','dirty')
     data = compute(sample_set(name),'balance')
     runs = list_shifts(current_app.book) if tab in ('shifts','sign') else []
-    return render_template('base.html',section=tab,tabs=SECTIONS,sample=name,data=data,rev=RULESET,
+    return render_template('base.html',section=tab,tabs=SECTIONS,sample=name,data=data,rev=current_rules()['name'],
                            runs=runs,current=request.args.get('batch',''))

@@ -1,7 +1,7 @@
 from flask import Blueprint, current_app, jsonify
 from app.bundles import submitted
 from app.dispatch.signatures import evidence_file,sign
-from app.ledger.replay import list_shifts,replay,shift
+from app.ledger.replay import list_shifts,recheck,replay,shift
 from app.shift import compute
 
 routes = Blueprint('ramp_api',__name__)
@@ -50,6 +50,12 @@ def archive():
 @routes.get('/api/shifts/<batch>')
 def load(batch):
     return shift(current_app.book,batch)
+
+
+@routes.post('/api/shifts/<batch>/recheck')
+def redo(batch):
+    result = recheck(current_app.book,batch,submitted())
+    return result,200 if result['reused'] else 201
 
 
 @routes.post('/api/shifts/<batch>/sign')

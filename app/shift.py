@@ -1,3 +1,4 @@
+from app.configuration import current_rules
 from app.conversion.calculate import weigh
 from app.intake.evidence import admit
 from app.meters.catalog import fleet
@@ -6,7 +7,8 @@ from app.readings.rebuild import rebuild
 from app.settlement.report import reconcile
 
 
-def compute(files, through='balance', catalog=None):
+def compute(files, through='balance', catalog=None, rules=None):
+    rules = rules or current_rules()
     stage = {'intake':admit(files)}
     if through=='intake':
         return stage
@@ -17,7 +19,7 @@ def compute(files, through='balance', catalog=None):
     stage['readings'] = rebuild(stage['versions']['rows'])
     if through=='readings':
         return stage
-    stage['mass'] = weigh(stage['readings']['rows'],catalog['fuels'])
+    stage['mass'] = weigh(stage['readings']['rows'],catalog['fuels'],rules)
     if through!='mass':
         stage['balance'] = reconcile(stage['mass']['rows'],stage['intake'])
     return stage

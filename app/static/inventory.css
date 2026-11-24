@@ -12,4 +12,10 @@
 .gauge-card dd {margin:0;text-align:right;font-family:var(--mono)}
 .orphan {margin-top:14px;border-left:2px solid var(--alert);padding:5px 10px;background:var(--alert-bg)}
 .orphan p {margin:6px 0}
+.lineage {margin-top:var(--gap)}
+.lineage ol {margin:0 0 12px;padding-left:22px}
+.lineage li {padding:5px 8px;border-left:2px solid var(--line);margin-bottom:6px}
+.lineage li.current {border-left-color:var(--fill);background:var(--tint)}
+.lineage li span {display:block;font-family:var(--mono);font-size:13px}
+.lineage li small {display:block}
 @media print {.operations,#choose-bundle,footer,button{display:none}.terminal{display:block}.sticky-balance{position:static;color:black;background:white}.sticky-balance b{color:black}}

@@ -1,12 +1,13 @@
 from decimal import Decimal, ROUND_CEILING, ROUND_HALF_UP
 
-from app.configuration import TEMPERATURE_COEFFICIENT
+from app.configuration import current_rules
 
 FACTORS = {'kg/m3':Decimal('1'),'kg/L':Decimal('1000'),'g/L':Decimal('1')}
-REFERENCE_C = Decimal('15')
 
 
-def mass(reading, fuels):
+def mass(reading, fuels, rules=None):
+    rules = rules or current_rules()
+    reference = Decimal(rules['reference_temp_c'])
     data, version = reading['ticket_record'],reading['version']
     fuel = fuels.get(data['fuel'])
     if fuel is None:
@@ -21,7 +22,7 @@ def mass(reading, fuels):
     temp = Decimal(data['temp_c'])
     if not Decimal('-40') <= temp <= Decimal('60'):
         return None,'TEMPERATURE'
-    correction = 1 - Decimal(TEMPERATURE_COEFFICIENT)*(temp-REFERENCE_C)
+    correction = 1 - Decimal(rules['thermal_coefficient'])*(temp-reference)
     liters_15 = Decimal(reading['volume_l'])*correction
     grams = int((rho*liters_15).to_integral_value(rounding=ROUND_HALF_UP))
     proportional = int((Decimal(grams)*Decimal(version['ppm'])/1000000).to_integral_value(rounding=ROUND_CEILING))

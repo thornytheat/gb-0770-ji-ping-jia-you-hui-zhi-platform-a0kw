@@ -6,4 +6,6 @@
 
 从夜班三联单打开仪表回卷证据，比较真实回卷和人工归零，再查看库存差额及签收差。交班页可归档样例或填写完整三份 CSV。前五项 API 支持 GET 调样例和 POST 提交 `tickets`、`receipts`、`stock` 三份 CSV 文本字段。归档后可签发一份 JSON 证据单。
 
+规则更新后用 `POST /api/shifts/{batch}/recheck` 重交同一批三联单按现行口径复算：新结果作为同班次的新口径落账，旧签发单仍按原样复验，`GET /api/shifts/{batch}` 的 `lineage` 列出各口径的依据与适用时间。`FUEL_RULESET`、`FUEL_THERMAL_COEFFICIENT` 可切换现行规则。
+
 [换算及字段定义](docs/DATA-DICTIONARY.md) · [业务模块和回归](docs/DEPTH.md)

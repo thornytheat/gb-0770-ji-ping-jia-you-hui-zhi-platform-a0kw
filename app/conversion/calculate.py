@@ -1,13 +1,15 @@
+from app.configuration import current_rules
 from app.diagnostics import detail
 from .standard import mass
 
 
-def weigh(readings, fuels):
+def weigh(readings, fuels, rules=None):
+    rules = rules or current_rules()
     rows = []
     for reading in readings:
         fault,value = reading['fault'],None
         if not fault:
-            value,reason = mass(reading,fuels)
+            value,reason = mass(reading,fuels,rules)
             fault = detail(reason) if reason else None
         rows.append(dict(reading,fault=fault,standard=value))
     verified = [row['standard']['mass_g'] for row in rows if row['standard']]
